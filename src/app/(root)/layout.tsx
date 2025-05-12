@@ -1,4 +1,6 @@
+import Navbar from "@/components/Navbar";
 import StreamClientProvider from "@/components/providers/StreamClientProvider";
+
 
 function Layout({children}: {children: React.ReactNode}) {
     return (

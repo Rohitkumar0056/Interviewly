@@ -70,7 +70,7 @@ function MeetingRoom() {
 
               <div className="flex items-center gap-2 flex-wrap justify-center px-4">
                 
-                <CallControls onLeave={() => router.push("/")} />
+                <CallControls onLeave={() => router.push("/main")} />
 
                 <button
                 disabled={!canToggleClosedCaptions}

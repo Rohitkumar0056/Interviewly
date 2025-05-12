@@ -168,9 +168,9 @@ function CodeEditor() {
                 </ScrollArea>
             </ResizablePanel>
 
-            {isInterviewer && <ResizableHandle withHandle/>}
+            {isCandidate && <ResizableHandle withHandle/>}
 
-            {isInterviewer && <ResizablePanel defaultSize={60} maxSize={100}>
+            {isCandidate && <ResizablePanel defaultSize={60} maxSize={100}>
                 <div className="h-full relative">
                     <Editor
                         height={"100%"}

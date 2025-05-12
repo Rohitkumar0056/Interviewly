@@ -42,3 +42,30 @@ export const getUserByClerkId = query ({
         return user;
     },
 });
+
+export const updateUserRole = mutation({
+  args: {
+    clerkId: v.string(),
+    role: v.union(v.literal("candidate"), v.literal("interviewer")),
+  },
+  handler: async (ctx, { clerkId, role }) => {
+    // Try to find the user by their Clerk ID
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
+      .first();
+
+    if (!existing) {
+      // If we don’t have them yet, insert a minimal record
+      await ctx.db.insert("users", {
+        clerkId,
+        name: "",
+        email: "",
+        role,
+      });
+    } else {
+      // Otherwise, just update their role
+      await ctx.db.patch(existing._id, { role });
+    }
+  },
+});
