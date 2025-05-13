@@ -97,10 +97,9 @@ export const mappings = {
   "aws amplify": "amplify",
 };
 
-{/* export const interviewer: CreateAssistantDTO = {
+export const interviewer: CreateAssistantDTO = {
   name: "Interviewer",
-  firstMessage:
-    "Hello! Thank you for taking the time to speak with me today. I'm excited to learn more about you and your experience.",
+  firstMessage: "Hello! Thank you for taking the time to speak with me today. I'm excited to learn more about you and your experience.",
   transcriber: {
     provider: "deepgram",
     model: "nova-2",
@@ -153,8 +152,10 @@ End the conversation on a polite and positive note.
       },
     ],
   },
+  clientMessages: [],
+  serverMessages: []
 };
-*/}
+
 export const feedbackSchema = z.object({
   totalScore: z.number(),
   categoryScores: z.tuple([

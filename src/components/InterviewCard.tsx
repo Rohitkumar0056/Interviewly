@@ -4,23 +4,38 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import { cn, getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
+import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
 
 const InterviewCard = async ({
-  interviewId,
+  id,
   userId,
   role,
   type,
   techstack,
   createdAt,
 }: InterviewCardProps) => {
-    const feedback = null as Feedback | null;
-    const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
-    const formattedDate = dayjs(
-        feedback?.createdAt || createdAt || Date.now()
-    ).format("MMM D, YYYY");
+  const feedback =
+    userId && id
+      ? await getFeedbackByInterviewId({
+          interviewId: id,
+          userId,
+        })
+      : null;
+  const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
 
-    return (
-        <div className="bg-gradient-to-b from-[#4B4D4F] to-[#4B4D4F33] p-0.5 rounded-2xl flex-1 sm:basis-1/2 w-full h-[400px] max-md:hidden w-[360px] max-sm:w-full min-h-96">
+  const badgeColor =
+    {
+      Behavioral: "bg-light-400",
+      Mixed: "bg-light-600",
+      Technical: "bg-light-800",
+    }[normalizedType] || "bg-light-600";
+
+  const formattedDate = dayjs(
+    feedback?.createdAt || createdAt || Date.now()
+  ).format("MMM D, YYYY");
+
+  return (
+    <div className="bg-gradient-to-b from-[#4B4D4F] to-[#4B4D4F33] p-0.5 rounded-2xl flex-1 sm:basis-1/2 w-full h-[400px] max-md:hidden w-[360px] max-sm:w-full min-h-96">
       <div className="bg-gradient-to-b from-[#1A1C20] to-[#08090D] rounded-2xl min-h-full flex flex-col p-6 relative overflow-hidden gap-10 justify-between">
         <div>
           {/* Type Badge */}
@@ -76,8 +91,8 @@ const InterviewCard = async ({
             <Link
               href={
                 feedback
-                  ? `/interview/${interviewId}/feedback`
-                  : `/interview/${interviewId}`
+                  ? `/ai-interview/${id}/feedback`
+                  : `/ai-interview/${id}`
               }
             >
               {feedback ? "Check Feedback" : "View Interview"}
@@ -86,7 +101,7 @@ const InterviewCard = async ({
         </div>
       </div>
     </div>
-    )
+  );
 };
 
-export default InterviewCard
+export default InterviewCard;

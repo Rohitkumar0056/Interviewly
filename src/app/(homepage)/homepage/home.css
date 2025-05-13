@@ -71,3 +71,32 @@ section span:hover {
     }
 }
 
+.loader {
+    position: relative;
+}
+
+.loader h2 {
+  position: relative;
+  color: gray;
+  letter-spacing: 5px;
+  font-size: 4em;
+  text-transform: uppercase;
+
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+
+  animation: typing 8s infinite;
+}
+
+@keyframes typing {
+  /* tiny blank pause */
+  0%, 5%   { width: 0; }
+  /* type from 10% → 50% */
+  50%       { width: 100%; }
+  /* hold full text from 50% → 70% */
+  70%       { width: 100%; }
+  /* delete from 70% → 100% */
+  100%      { width: 0; }
+}

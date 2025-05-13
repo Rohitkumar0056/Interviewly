@@ -11,11 +11,11 @@ const DisplayTechIcons = async ({ techStack }: TechIconProps) => {
         <div
           key={tech}
           className={cn(
-            "relative group bg-green-200 rounded-full p-2 flex flex-center",
-            
+            "relative group bg-gray-700 rounded-full p-2 flex flex-center",
+            index >= 1 && '-ml-3'
           )}
         >
-          <span className="absolute bottom-full mb-1 hidden group-hover:flex px-2 py-1 text-xs text-white bg-gray-700 rounded-md shadow-md">{tech}</span>
+          <span className="absolute bottom-full mb-1 hidden group-hover:flex px-2 py-1 text-xs text-white bg-gray-700 rounded-md shadow-md capitalize">{tech}</span>
 
           <Image
             src={url}
