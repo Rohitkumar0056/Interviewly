@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Interviewly
+
+Interviewly is a role-based video interview platform featuring real-time collaboration, screen sharing, live captions, and an integrated code editor.
+
+## Features
+
+- **Role-Based Access:** Distinct interviewer and candidate experiences with secure authentication and role management.
+- **Real-Time Video Interviews:** High-quality video calls with screen sharing and live closed captions.
+- **Collaborative Code Editor:** Built-in code editor for technical interviews with language selection and real-time updates.
+- **AI-Driven Automation:** Mock interviews powered by AI, automatic parsing and scoring of candidate responses, and instant feedback reports highlighting scores, strengths, and areas for improvement.
+- **Interviewer Dashboard:** Schedule interviews, review past recordings, rate candidates, and manage team roles.
+- **Instant Evaluation:** Automated scoring and feedback reduce manual evaluation time by up to 80%.
+
+## Tech Stack
+
+- **Frontend:** Next.js, TypeScript, Tailwind CSS
+- **Authentication:** Clerk
+- **Video & Collaboration:** Stream
+- **Backend:** Convex, Firebase
+- **AI & Automation:** Vapi AI, Gemini AI
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js (v18+ recommended)
+- npm or yarn
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies:
+    ```bash
+    npm install
+    ```
+2. Set up environment variables in `.env.local` for Firebase, Clerk, Stream, and AI providers.
+3. Run the development server:
+    ```bash
+    npm run dev
+    ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+- [`src/app`](src/app) - Next.js app directory (routes, pages, layouts)
+- [`src/components`](src/components) - UI and feature components
+- [`src/hooks`](src/hooks) - Custom React hooks
+- [`src/lib`](src/lib) - Utilities and server actions
+- [`convex/`](convex) - Convex backend functions and schema
+- [`firebase/`](firebase) - Firebase admin and client setup
+- [`public/`](public) - Static assets
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
