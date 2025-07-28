@@ -4,30 +4,80 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "./ui/resiz
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { AlertCircleIcon, BookIcon, LightbulbIcon, RotateCcwIcon } from "lucide-react";
+import { AlertCircleIcon, BookIcon, LightbulbIcon, RotateCcwIcon, PlayIcon, LoaderIcon } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "./ui/button";
 import Editor from "@monaco-editor/react";
 
+interface ExecutionResult {
+    output?: string;
+    error?: string;
+    executionTime?: number;
+}
+
 function CodeEditor() {
     const [selectedQuestion, setSelectedQuestion] = useState(CODING_QUESTIONS[0]);
-    const [language, setLanguage] = useState<"javascript" | "python" | "java">(LANGUAGES[0].id);
+    const [language, setLanguage] = useState<"javascript" | "python" | "java" | "cpp">(LANGUAGES[0].id);
     const [code, setCode] = useState(selectedQuestion.starterCode[language]);
+    const [isRunning, setIsRunning] = useState(false);
+    const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
     const { isInterviewer, isCandidate } = useUserRole();
 
     const handleQuestionChange = (questionId: string) => {
         const question = CODING_QUESTIONS.find((q) => q.id === questionId)!;
         setSelectedQuestion(question);
         setCode(question.starterCode[language]);
+        setExecutionResult(null); // Clear previous results
     }; 
 
-    const handleLanguageChange = (newLanguage: "javascript" | "python" | "java") => {
+    const handleLanguageChange = (newLanguage: "javascript" | "python" | "java" | "cpp") => {
         setLanguage(newLanguage);
         setCode(selectedQuestion.starterCode[newLanguage]);
+        setExecutionResult(null); // Clear previous results
     };
 
     const handleRefresh = () => {
         setCode(selectedQuestion.starterCode[language]);
+        setExecutionResult(null); // Clear previous results
+    };
+
+    const handleRunCode = async () => {
+        if (!code.trim()) return;
+        
+        setIsRunning(true);
+        setExecutionResult(null);
+
+        try {
+            const response = await fetch('/api/execute-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    code,
+                    language,
+                }),
+            });
+
+            const result = await response.json();
+            setExecutionResult(result);
+        } catch (error) {
+            setExecutionResult({
+                error: 'Failed to execute code. Please try again.',
+            });
+        } finally {
+            setIsRunning(false);
+        }
+    };
+
+    const getMonacoLanguage = () => {
+        switch (language) {
+            case 'javascript': return 'javascript';
+            case 'python': return 'python';
+            case 'java': return 'java';
+            case 'cpp': return 'cpp';
+            default: return 'javascript';
+        }
     };
     
     return (
@@ -49,9 +99,33 @@ function CodeEditor() {
                                     </p>  
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Button onClick={handleRefresh} className="p-2 bg-[#1e1e2e] hover:bg-[#2a2a3a] rounded-lg ring-1 ring-white/5 transition-colors" aria-label="Reset to default code">
+                                    <Button 
+                                        onClick={handleRefresh} 
+                                        className="p-2 bg-[#1e1e2e] hover:bg-[#2a2a3a] rounded-lg ring-1 ring-white/5 transition-colors" 
+                                        aria-label="Reset to default code"
+                                    >
                                         <RotateCcwIcon className="size-4 text-gray-400" />
                                     </Button>
+
+                                    {isCandidate && (
+                                        <Button 
+                                            onClick={handleRunCode}
+                                            disabled={isRunning || !code.trim()}
+                                            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                                        >
+                                            {isRunning ? (
+                                                <>
+                                                    <LoaderIcon className="size-4 animate-spin" />
+                                                    Running...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <PlayIcon className="size-4" />
+                                                    Run
+                                                </>
+                                            )}
+                                        </Button>
+                                    )}
 
                                     <Select value={selectedQuestion.id} onValueChange={handleQuestionChange}>
                                         <SelectTrigger className="w-[180px]">
@@ -170,28 +244,77 @@ function CodeEditor() {
 
             {isCandidate && <ResizableHandle withHandle/>}
 
-            {isCandidate && <ResizablePanel defaultSize={60} maxSize={100}>
-                <div className="h-full relative">
-                    <Editor
-                        height={"100%"}
-                        defaultLanguage={language}
-                        language={language}
-                        theme="vs-dark"
-                        value={code}
-                        onChange={(value) => setCode(value || "")}
-                        options={{
-                            minimap: { enabled: false },
-                            fontSize: 18,
-                            lineNumbers: "on",
-                            scrollBeyondLastLine: false,
-                            automaticLayout: true,
-                            padding: { top: 16, bottom: 16 },
-                            wordWrap: "on",
-                            wrappingIndent: "indent",
-                        }}
-                    />
-                </div>
-            </ResizablePanel>}
+            {isCandidate && (
+                <ResizablePanel defaultSize={60} maxSize={100}>
+                    <ResizablePanelGroup direction="vertical">
+                        <ResizablePanel defaultSize={70} minSize={30}>
+                            <div className="h-full relative">
+                                <Editor
+                                    height={"100%"}
+                                    defaultLanguage={getMonacoLanguage()}
+                                    language={getMonacoLanguage()}
+                                    theme="vs-dark"
+                                    value={code}
+                                    onChange={(value) => setCode(value || "")}
+                                    options={{
+                                        minimap: { enabled: false },
+                                        fontSize: 18,
+                                        lineNumbers: "on",
+                                        scrollBeyondLastLine: false,
+                                        automaticLayout: true,
+                                        padding: { top: 16, bottom: 16 },
+                                        wordWrap: "on",
+                                        wrappingIndent: "indent",
+                                    }}
+                                />
+                            </div>
+                        </ResizablePanel>
+
+                        <ResizableHandle withHandle/>
+
+                        <ResizablePanel defaultSize={30} minSize={20}>
+                            <div className="h-full bg-[#1e1e1e]">
+                                <div className="h-full flex flex-col">
+                                    <div className="px-4 py-2 bg-[#2d2d30]">
+                                        <h3 className="text-sm font-medium text-gray-300">Console</h3>
+                                    </div>
+                                    <ScrollArea className="flex-1 p-4">
+                                        {executionResult ? (
+                                            <div className="space-y-2">
+                                                {executionResult.output && (
+                                                    <div>
+                                                        <h4 className="text-xs font-medium text-green-400 mb-1">Output:</h4>
+                                                        <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono bg-[#0d1117] p-3 rounded border border-gray-600">
+                                                            {executionResult.output}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                {executionResult.error && (
+                                                    <div>
+                                                        <h4 className="text-xs font-medium text-red-400 mb-1">Error:</h4>
+                                                        <pre className="text-sm text-red-300 whitespace-pre-wrap font-mono bg-red-950/20 p-3 rounded border border-red-800">
+                                                            {executionResult.error}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                {executionResult.executionTime && (
+                                                    <div className="text-xs text-gray-400">
+                                                        Execution time: {executionResult.executionTime}ms
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="text-sm text-muted-foreground italic">
+                                                {isRunning ? "Running code..." : "Click 'Run' to execute your code"}
+                                            </div>
+                                        )}
+                                    </ScrollArea>
+                                </div>
+                            </div>
+                        </ResizablePanel>
+                    </ResizablePanelGroup>
+                </ResizablePanel>
+            )}
         </ResizablePanelGroup>
     );
 };
