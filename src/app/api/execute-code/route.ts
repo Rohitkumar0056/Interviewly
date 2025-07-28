@@ -1,6 +1,3 @@
-// pages/api/execute-code.ts or app/api/execute-code/route.ts (depending on your Next.js version)
-
-import { NextApiRequest, NextApiResponse } from 'next';
 import { exec } from 'child_process';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -12,7 +9,6 @@ interface ExecutionResult {
     executionTime?: number;
 }
 
-// For App Router (Next.js 13+)
 export async function POST(request: Request) {
     try {
         const { code, language } = await request.json();
@@ -28,8 +24,6 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
-
-
 
 async function executeCode(code: string, language: string): Promise<ExecutionResult> {
     const startTime = Date.now();
